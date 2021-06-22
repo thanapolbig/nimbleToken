@@ -1,4 +1,4 @@
-// //SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.5;
 
 import "hardhat/console.sol";
@@ -17,10 +17,11 @@ import "hardhat/console.sol";
 //   }
 
 //   function setGreeting(string memory _greeting) public {
-    // console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
+//     console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
 //     greeting = _greeting;
 //   }
 // }
+
 
 contract SimpleBank {
     
@@ -43,7 +44,7 @@ contract SimpleBank {
         wallet[msg.sender].Name = _Name;
         wallet[msg.sender].balances = 0;
         wallet[msg.sender].owner = msg.sender;
-        console.log("init account Name : '%s'" ,_Name);
+        console.log("init account success");
     }
 
     
