@@ -3,7 +3,6 @@ pragma solidity ^0.8.5;
 
 import "hardhat/console.sol";
 
-
 contract SimpleBank {
     
     struct Wallet{
@@ -32,14 +31,19 @@ contract SimpleBank {
     function deposit(uint depositAmount) public payable {
         wallet[msg.sender].balances += depositAmount;
         emit LogDepositMade(msg.sender, msg.value);
+        console.log("deposit success");
     }
     function withdraw(uint withdrawAmount) public CheckBalances(withdrawAmount) {
-            wallet[msg.sender].balances -= withdrawAmount;
+        wallet[msg.sender].balances -= withdrawAmount;
+        console.log("withdraw success");
+
     }
     
     function TransferTo(address transferTo,uint amount) public CheckBalances(amount) {
             wallet[msg.sender].balances -= amount;
             wallet[transferTo].balances += amount;
+        console.log("Transfer success");
+
     }
 
 }
