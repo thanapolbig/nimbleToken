@@ -1,0 +1,4 @@
+#run
+```
+npx hardhat node
+```
