@@ -38,7 +38,7 @@ func (ep *Endpoint)GetBalance(c *gin.Context)  {
 		return
 	}
 
-	client, err := ethclient.Dial("http://127.0.0.1:8545")
+	client, err := ethclient.Dial("https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,6 +178,10 @@ func (ep *Endpoint)BalanceOf(c *gin.Context) {
 
 	fmt.Printf("balance: %f", value) //
 
+	c.JSON(http.StatusOK, value)
+	return
+
+
 }
 
 
@@ -300,6 +304,11 @@ func (ep *Endpoint)ContractMint(c *gin.Context) {
 
 	fmt.Printf("totalSupply: %v\n", totalSupply)
 
+
+
+	c.JSON(http.StatusOK, totalSupply)
+	return
+
 }
 
 
@@ -390,8 +399,6 @@ func (ep *Endpoint)Appove(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-
 
 }
 func (ep *Endpoint)Allowance(c *gin.Context)  {
@@ -504,6 +511,94 @@ func (ep *Endpoint) TransferFrom(c *gin.Context) {
 	fmt.Println(gasLimit)
 
 	tx := types.NewTransaction(nonce, contracts, value, gasLimit, gasPrice, data)
+
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.SendTransaction(context.Background(), signedTx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func (ep *Endpoint)Burn(c *gin.Context){
+
+	var request InputBurn
+	log.Infof("input : %s", request)
+	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	client, err := ethclient.Dial("http://127.0.0.1:8545")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	privateKey, err := crypto.HexToECDSA(request.PrivateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Infof("fromAddress : %s",fromAddress)
+
+	value := big.NewInt(0) // in wei (0 eth) จำนวน eth
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	tokenAddress := common.HexToAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+
+	transferFnSignature := []byte("burn(address,uint256)")
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(transferFnSignature)
+	methodID := hash.Sum(nil)[:4]
+	fmt.Println(hexutil.Encode(methodID))
+
+	paddedAddress := common.LeftPadBytes(fromAddress.Bytes(), 32)
+	fmt.Println(hexutil.Encode(paddedAddress))
+
+	amount := new(big.Int)
+	amount.SetString(request.Value, 10) // จำนวน token
+
+	paddedAmount := common.LeftPadBytes(amount.Bytes(), 32)
+	fmt.Println(hexutil.Encode(paddedAmount))
+
+	var data []byte
+	data = append(data, methodID...)
+	data = append(data, paddedAddress...)
+	data = append(data, paddedAmount...)
+
+	gasLimit, err := client.EstimateGas(context.Background(), ethereum.CallMsg{
+		From: fromAddress,
+		To:   &tokenAddress,
+		Data: data,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(gasLimit)
+
+	tx := types.NewTransaction(nonce, tokenAddress, value, gasLimit, gasPrice, data)
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {

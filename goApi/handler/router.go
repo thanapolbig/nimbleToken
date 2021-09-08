@@ -74,6 +74,13 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Pattern:     "/claimReward",
 			Endpoint:    service.TransferFrom,
 		},
+		{
+			Name:        "Burn : POST ",
+			Description: "Burn",
+			Method:      http.MethodPost,
+			Pattern:     "/burn",
+			Endpoint:    service.Burn,
+		},
 
 
 	}

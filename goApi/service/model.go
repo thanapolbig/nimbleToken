@@ -32,3 +32,8 @@ type InputAllowance struct {
 	FromAddress string `json:"fromAddress"`
 	ToAddress   string `json:"toAddress"`
 }
+
+type InputBurn struct {
+	PrivateKey string `json:"privatekey"`
+	Value      string `json:"value"`
+}
