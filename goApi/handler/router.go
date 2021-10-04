@@ -43,7 +43,7 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Name:        "BalanceOf : POST ",
 			Description: "BalanceOf",
 			Method:      http.MethodPost,
-			Pattern:     "/contractRead",
+			Pattern:     "/balanceOf",
 			Endpoint:    service.BalanceOf,
 		},
 		{
@@ -81,7 +81,48 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Pattern:     "/burn",
 			Endpoint:    service.Burn,
 		},
-
+		{
+			Name:        "AddWorkday : POST ",
+			Description: "AddWorkday",
+			Method:      http.MethodPost,
+			Pattern:     "/addWorkday",
+			Endpoint:    service.AddWorkday,
+		},
+		{
+			Name:        "ConfigMint : POST ",
+			Description: "ConfigMint",
+			Method:      http.MethodPost,
+			Pattern:     "/configMint",
+			Endpoint:    service.ConfigMint,
+		},
+		{
+			Name:        "MintToken : POST ",
+			Description: "MintToken",
+			Method:      http.MethodPost,
+			Pattern:     "/mintToken",
+			Endpoint:    service.MintToken,
+		},
+		{
+			Name:        "AutoClaimCheckin : POST ",
+			Description: "AutoClaimCheckin",
+			Method:      http.MethodPost,
+			Pattern:     "/autoClaimCheckin",
+			Endpoint:    service.AutoClaimCheckin,
+		},
+		{
+			Name:        "AddVote : POST ",
+			Description: "AddVote",
+			Method:      http.MethodPost,
+			Pattern:     "/addVote",
+			Endpoint:    service.AddVote,
+		},
+		{
+			Name:        "Vote : POST ",
+			Description: "Vote",
+			Method:      http.MethodPost,
+			Pattern:     "/vote",
+			Endpoint:    service.Vote,
+		},
 
 	}
 

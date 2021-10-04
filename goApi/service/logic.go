@@ -16,7 +16,6 @@ import (
 	"github.com/miguelmota/ethereum-development-with-go/interface"
 	"golang.org/x/crypto/sha3"
 
-	//token "github.com/miguelmota/ethereum-development-with-go/build"
 	log "github.com/sirupsen/logrus"
 	"math"
 	"math/big"
@@ -67,7 +66,7 @@ func (ep *Endpoint)TransferEth(c *gin.Context){
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	log.Infof("Body Key : %s", request.Key)
+	log.Infof("Body PrivateKey : %s", request.Key)
 	log.Infof("Body Value  : %d", request.Value)
 
 
@@ -124,7 +123,7 @@ func (ep *Endpoint)TransferEth(c *gin.Context){
 	fmt.Printf("tx sent: %s", signedTx.Hash().Hex())
 }
 
-func (ep *Endpoint)BalanceOf(c *gin.Context) {
+func (ep *Endpoint)BalanceOf(c *gin.Context)  {
 
 	var request InputBalanceOf //model รับ input จาก body
 	log.Infof("input : %s", request)
@@ -166,9 +165,9 @@ func (ep *Endpoint)BalanceOf(c *gin.Context) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("name: %s\n", name)         // "name: Golem Network"
-	fmt.Printf("symbol: %s\n", symbol)     // "symbol: GNT"
-	fmt.Printf("decimals: %v\n", decimals) // "decimals: 18"
+	fmt.Printf("name: %s\n", name)         // "name: nimble"
+	fmt.Printf("symbol: %s\n", symbol)     // "symbol: nimble"
+	fmt.Printf("decimals: %v\n", decimals) // "decimals: 3"
 
 	fmt.Printf("wei: %s\n", bal) //
 
@@ -180,7 +179,6 @@ func (ep *Endpoint)BalanceOf(c *gin.Context) {
 
 	c.JSON(http.StatusOK, value)
 	return
-
 
 }
 

@@ -16,7 +16,7 @@ import (
 //}
 //
 //type Input struct {
-//	Key 		string		`json:"key"`
+//	PrivateKey 		string		`json:"key"`
 //	Value		int64		`json:"value"`
 //}
 //

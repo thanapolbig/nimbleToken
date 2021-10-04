@@ -1,5 +1,6 @@
 package service
 
+import "github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 type Input struct {
 	Key 		string		`json:"address"`
@@ -37,3 +38,26 @@ type InputBurn struct {
 	PrivateKey string `json:"privatekey"`
 	Value      string `json:"value"`
 }
+
+type InputKeyValue struct {
+	PrivateKey string `json:"privatekey"`
+	Value      string `json:"value"`
+}
+
+type InputKeyArray struct {
+	PrivateKey string 		`json:"privatekey"`
+	DataList	[]string	`json:"data_list"`
+}
+type Vote struct {
+	PrivateKey string `json:"privatekey"`
+	ToAddress  string `json:"toAddress"`
+	Value      string `json:"value"`
+}
+
+type TokenSession struct {
+	Contract     interface{}
+	CallOpts     *bind.CallOpts
+	TransactOpts *bind.TransactOpts
+}
+
+
