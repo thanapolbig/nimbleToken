@@ -211,13 +211,13 @@ contract MasterChef is Ownable {
     function closeEvent(uint eid)public{
         require(eventInfo[eid].createBy == msg.sender, "access denied");
         require(eventInfo[eid].status == 1, "status invalid");
-        eventInfo[eid].status = 2;
+        eventInfo[eid].status = 0;
     }
 
     function AcceptEvent(uint256 eid,address[] memory wallet)public{
         require(eventInfo[eid].createBy == msg.sender, "access denied");
         require(eventInfo[eid].status == 1, "status invalid");
-        eventInfo[eid].status = 3;
+        eventInfo[eid].status = 2;
         //transfer
 
         uint reward = eventInfo[eid].reward/wallet.length;

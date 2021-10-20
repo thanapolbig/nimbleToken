@@ -123,6 +123,62 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Pattern:     "/vote",
 			Endpoint:    service.Vote,
 		},
+		{
+			Name:        "CheckScoreVote : POST ",
+			Description: "CheckScoreVote",
+			Method:      http.MethodPost,
+			Pattern:     "/checkScoreVote",
+			Endpoint:    service.CheckScoreVote,
+		},
+		{
+			Name:        "AutoClaimScoreVote : POST ",
+			Description: "AutoClaimScoreVote",
+			Method:      http.MethodPost,
+			Pattern:     "/autoClaimScoreVote",
+			Endpoint:    service.AutoClaimScoreVote,
+		},
+		{
+			Name:        "CreateEvent : POST ",
+			Description: "CreateEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/createEvent",
+			Endpoint:    service.CreateEvent,
+		},
+		{
+			Name:        "StartEvent : POST ",
+			Description: "StartEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/startEvent",
+			Endpoint:    service.StartEvent,
+		},
+		{
+			Name:        "JoinEvent : POST ",
+			Description: "JoinEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/joinEvent",
+			Endpoint:    service.JoinEvent,
+		},
+		{
+			Name:        "CloseEvent : POST ",
+			Description: "CloseEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/closeEvent",
+			Endpoint:    service.CloseEvent,
+		},
+		{
+			Name:        "AcceptEvent : POST ",
+			Description: "AcceptEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/acceptEvent",
+			Endpoint:    service.AcceptEvent,
+		},
+		{
+			Name:        "CreateEventByAdmin : POST ",
+			Description: "CreateEventByAdmin",
+			Method:      http.MethodPost,
+			Pattern:     "/createEventByAdmin",
+			Endpoint:    service.CreateEventByAdmin,
+		},
 
 	}
 

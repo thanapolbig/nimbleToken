@@ -25,6 +25,7 @@ require (
 	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/uber/jaeger-client-go v2.23.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect
 	go.uber.org/atomic v1.6.0 // indirect

@@ -1,6 +1,12 @@
 package service
 
-import "github.com/ethereum/go-ethereum/accounts/abi/bind"
+import (
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"math/big"
+	"time"
+)
+
+const success = "200"
 
 type Input struct {
 	Key 		string		`json:"address"`
@@ -60,4 +66,30 @@ type TokenSession struct {
 	TransactOpts *bind.TransactOpts
 }
 
+type Event struct {
+	PrivateKey string `json:"privatekey"`
+	EventName string `json:"event_name"`
+	Detial    string `json:"detial"`
+	Reward    string `json:"reward"`
+	TimeStart time.Time `json:"time_start"`
+}
 
+type ActionResponseList struct {
+	Status             string `json:"status"`
+	MessageCode        string `json:"message_code"`
+	MessageDescription string `json:"message_description"`
+}
+
+
+type ReturnScore struct {
+	Status             string `json:"status"`
+	MessageCode        string `json:"message_code"`
+	RightScore		   *big.Int `json:"right_score"`
+	ScoreVoteTotal	   *big.Int `json:"score_vote_total"`
+}
+
+type AcceptEvent struct {
+	PrivateKey 	string 		`json:"privatekey"`
+	Eid			string		`json:"eid"`
+	DataList	[]string	`json:"data_list"`
+}
