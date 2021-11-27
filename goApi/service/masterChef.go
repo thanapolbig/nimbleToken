@@ -1000,3 +1000,129 @@ func (ep *Endpoint)CreateEventByAdmin(c *gin.Context)  {
 
 	return
 }
+
+func (ep *Endpoint)AcceptEventAdmin(c *gin.Context)  {
+
+	var request AcceptEvent //model รับ input จาก body
+	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
+		log.Errorf("[AcceptEventAdmin] %+v",err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	client,err := ep.connectWeb3()
+	if err != nil {
+		log.Errorf("[AcceptEventAdmin.GetRightScore] : %+v",err)
+	}
+	fmt.Println(client)
+
+	privateKey,err := ep.connectPrivateKey(request.PrivateKey)
+	if err != nil{
+		log.Errorf("[AcceptEventAdmin.GetRightScore] : %+v",err)
+	}
+
+	fromAddress,err := ep.convertWallet1(privateKey)
+	if err != nil{
+		log.Errorf("[AcceptEventAdmin.GetRightScore] : %+v",err)
+	}
+	log.Infof("From : %s",fromAddress)
+	//list address
+	var list []common.Address
+	for i:=0;i< len(request.DataList);i++{
+		list = append(list, common.HexToAddress(request.DataList[i]))
+	}
+	log.Infof("[AcceptEventAdmin]list address : %s",list)
+	//eid
+	eid := new(big.Int)
+	eid.SetString(request.Eid,10)
+	log.Println("eid : " , eid)
+
+	Auth := bind.NewKeyedTransactor(privateKey)
+
+	instance, err := _masterChef.NewApi(masterChefAddress, client)
+	if err != nil {
+		log.Errorf("[AcceptEventAdmin.GetRightScore] : %+v",err)
+	}
+
+	session := &TokenSession{
+		Contract: masterChefAddress,
+		CallOpts: &bind.CallOpts{
+			Pending: true,
+		},
+		TransactOpts: &bind.TransactOpts{
+			From:     Auth.From,
+			Signer:   Auth.Signer,
+			GasLimit: 3141592,
+		},
+	}
+
+	AcceptEventAdmin, err := instance.AcceptEventAdmin(session.TransactOpts,eid,list)
+	if err != nil {
+		log.Errorf("[AcceptEventAdmin.GetRightScore] : %+v",err)
+	}
+	log.Infof("AcceptEventAdmin : %s", AcceptEventAdmin)
+
+	c.JSON(http.StatusOK, "AcceptEventAdmin success")
+
+	return
+}
+
+func (ep *Endpoint)EventInfo(c *gin.Context)  {
+
+	var request InputKeyValue
+	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
+		log.Errorf("[EventInfo] %+v",err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	client,err := ep.connectWeb3()
+	if err != nil {
+		log.Errorf("[EventInfo.connectWeb3] : %+v",err)
+	}
+	fmt.Println(client)
+
+	privateKey,err := ep.connectPrivateKey(request.PrivateKey)
+	if err != nil{
+		log.Errorf("[EventInfo.connectPrivateKey] : %+v",err)
+	}
+
+	fromAddress,err := ep.convertWallet1(privateKey)
+	if err != nil{
+		log.Errorf("[EventInfo.convertWallet1] : %+v",err)
+	}
+	log.Infof("From : %s",fromAddress)
+
+	Auth := bind.NewKeyedTransactor(privateKey)
+
+	instance, err := _masterChef.NewApi(masterChefAddress, client)
+	if err != nil {
+		log.Errorf("[EventInfo.NewApi] : %+v",err)
+	}
+
+	session := &TokenSession{
+		Contract: masterChefAddress,
+		CallOpts: &bind.CallOpts{
+			Pending: true,
+		},
+		TransactOpts: &bind.TransactOpts{
+			From:     Auth.From,
+			Signer:   Auth.Signer,
+			GasLimit: 3141592,
+		},
+	}
+
+	eid := new(big.Int)
+	eid.SetString(request.Value,10)
+	log.Println("eid : " , eid)
+
+	EventInfo, err := instance.EventInfo(session.CallOpts,eid)
+	if err != nil {
+		log.Errorf("[CloseEvent.sendtransaction] : %+v",err)
+	}
+	log.Infof("EventInfo : %s", EventInfo)
+
+	c.JSON(http.StatusOK, EventInfo)
+
+	return
+}
