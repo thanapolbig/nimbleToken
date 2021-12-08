@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/miguelmota/ethereum-development-with-go/app"
 	"github.com/miguelmota/ethereum-development-with-go/handler"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -10,57 +11,32 @@ import (
 	"os/signal"
 )
 
-//
-//type Data struct {
-//
-//}
-//
-//type Input struct {
-//	PrivateKey 		string		`json:"key"`
-//	Value		int64		`json:"value"`
-//}
-//
-//func setupRouter() *gin.Engine {
-//	r := gin.Default()
-//	data := Data{}
-//
-//	r.POST("/getBalance", data.GetBalance)
-//	r.POST("/transferEth", data.TransferEth)
-//
-//	return r
-//}
-//
-//
-//func (d *Data)GetBalance(c *gin.Context)  {
-//	client, err := ethclient.Dial("http://127.0.0.1:8545")
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	account := common.HexToAddress("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266")
-//	balance, err := client.BalanceAt(context.Background(), account, nil)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	fmt.Println(balance) // 25893860171173005034
-//
-//	fbalance := new(big.Float)
-//	fbalance.SetString(balance.String())
-//	ethValue := new(big.Float).Quo(fbalance, big.NewFloat(math.Pow10(18)))
-//	fmt.Println(ethValue) // 25.729324269165216041
-//
-//	c.JSON(http.StatusOK, ethValue)
-//}
-//
-
-
-
-
 func main() {
-	//r := setupRouter()
-	//r.Run()
 
-
+	portAuth := flag.String("portAuth", "4440", "portAuth number")
 	portApp := flag.String("portApp", "8080", "portApp number")
+	configPath := flag.String("config", "configure", "set configs path, default as: 'configure'")
+	stage := flag.String("stage", "dev", "set working environment")
+
+	flag.Parse()
+	log.Infof("portAuth : %+v", *portAuth)
+	log.Infof("portApp : %+v", *portApp)
+	log.Infof("configPath directory : %+v", *configPath)
+
+	cv := app.Configs{ConfigPath: *configPath}
+	if err := cv.InitViperWithStage(*stage); err != nil {
+		panic(err)
+	}
+	log.Println("config: %+v", cv)
+	em := app.ErrorMessage{Configs: cv}
+	if err := em.Init(); err != nil {
+		panic(err)
+	}
+
+	//connect database
+	//InitConnectionDatabase(*configPath)
+	app.InitDB(&cv)
+
 	//start http APP server
 	r := handler.Routes{} //new object
 	handleRoute := r.InitTransactionRoute()
@@ -68,6 +44,15 @@ func main() {
 		Addr:    fmt.Sprint(":", *portApp), //":8080"
 		Handler: handleRoute,
 	}
+
+	//start http Auth server
+	rAuth := handler.Routes{} //new object
+	handleRouteAuth := rAuth.InitTransactionRouteAuth(&cv, &em)
+	AuthSrv := &http.Server{
+		Addr:    fmt.Sprint(":", *portAuth), //":4440"
+		Handler: handleRouteAuth,
+	}
+
 	go func() {
 		if err := AppSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Panicf("transaction listen: %s\n", err)
@@ -77,10 +62,27 @@ func main() {
 		log.Infof("transaction listen at: %s", *portApp)
 	}()
 
+	//start http Auth server
+	go func() {
+		if err := AuthSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Panicf("transaction listen: %s\n", err)
+		} else if err != nil {
+			log.Panicf("transaction listen error: %s\n", err)
+		}
+		log.Infof("transaction listen at: %s", *portAuth)
+	}()
+
+	//s := handler.InitScheduler(&cv, &em)
+	//s.StartScheduler()
+
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt)
 	<-signals // wait for SIGINT
 
 
 }
+
+//func InitConnectionDatabase(configPath string) {
+//	app.InitDB(configPath)
+//}
 

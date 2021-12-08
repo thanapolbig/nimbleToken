@@ -2,7 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/miguelmota/ethereum-development-with-go/app"
 	"github.com/miguelmota/ethereum-development-with-go/service"
+	"github.com/miguelmota/ethereum-development-with-go/service/auth"
 	"net/http"
 )
 
@@ -45,13 +47,6 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Method:      http.MethodPost,
 			Pattern:     "/balanceOf",
 			Endpoint:    service.BalanceOf,
-		},
-		{
-			Name:        "ContractMint : POST ",
-			Description: "ContractMint",
-			Method:      http.MethodPost,
-			Pattern:     "/contractMint",
-			Endpoint:    service.ContractMint,
 		},
 		{
 			Name:        "Appove : POST ",
@@ -179,6 +174,34 @@ func (r Routes) InitTransactionRoute() http.Handler {
 			Pattern:     "/createEventByAdmin",
 			Endpoint:    service.CreateEventByAdmin,
 		},
+		{
+			Name:        "GetBalanceToken : POST ",
+			Description: "GetBalanceToken",
+			Method:      http.MethodPost,
+			Pattern:     "/getBalanceToken",
+			Endpoint:    service.GetBalanceToken,
+		},
+		{
+			Name:        "AcceptEventAdmin : POST ",
+			Description: "AcceptEventAdmin",
+			Method:      http.MethodPost,
+			Pattern:     "/acceptEventAdmin",
+			Endpoint:    service.AcceptEventAdmin,
+		},
+		{
+			Name:        "EventInfo : POST ",
+			Description: "EventInfo",
+			Method:      http.MethodPost,
+			Pattern:     "/eventInfo",
+			Endpoint:    service.EventInfo,
+		},
+		{
+			Name:        "SearchEvent : POST ",
+			Description: "SearchEvent",
+			Method:      http.MethodPost,
+			Pattern:     "/searchEvent",
+			Endpoint:    service.SearchEvent,
+		},
 
 	}
 
@@ -190,4 +213,42 @@ func (r Routes) InitTransactionRoute() http.Handler {
 	}
 
 	return ro
+}
+
+func (rAuth Routes) InitTransactionRouteAuth(cv *app.Configs, em *app.ErrorMessage) http.Handler {
+
+	auth := auth.NewEndpoint(cv, em)
+
+	txAuth := []route{
+		{
+			Name:        "register",
+			Description: "register",
+			Method:      http.MethodPost,
+			Pattern:     "/register",
+			Endpoint:    auth.Register,
+		},
+		{
+			Name:        "signin",
+			Description: "signin",
+			Method:      http.MethodPost,
+			Pattern:     "/signin",
+			Endpoint:    auth.SignIn,
+		},
+		{
+			Name:        "Refresh",
+			Description: "Refresh",
+			Method:      http.MethodPost,
+			Pattern:     "/refresh",
+			Endpoint:    auth.Refresh,
+		},
+	}
+
+	roAuth := gin.New()
+
+	storeAuth := roAuth.Group("/auth")
+	for _, e := range txAuth {
+		storeAuth.Handle(e.Method, e.Pattern, e.Endpoint)
+	}
+
+	return roAuth
 }

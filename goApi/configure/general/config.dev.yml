@@ -1,0 +1,15 @@
+mssql:
+  enableConnect: true #true
+  databaseType: "mssql"
+  server: "68.183.225.34"
+  port: 1433
+  username: "SA"
+  password: "P@ssw0rd"
+  database:
+    master: "NimbleToken"
+
+scheduler:
+  enableJob: false #true
+
+expirationTime:
+  expHour: 1

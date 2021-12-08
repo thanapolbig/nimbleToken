@@ -75,7 +75,7 @@ describe("MasterChef", function(){
         await eventBar.connect(owner).transferOwnership(masterChefId);
         await masterChef.connect(owner).mint(); //50000
         // 20 % => 10000
-        await masterChef.connect(owner).addWorkday(200); // 10000/200 = 50/day
+        await masterChef.connect(owner).addWorkday(200); // 10000/200 = 50token/day
         const addressArray = [owner.address,addr1.address,addr2.address,addrs[0].address,addrs[1].address]
         await masterChef.connect(owner).autoClaimCheckin(addressArray) // 10 /address
         const balOwner = await nimbleToken.balanceOf(owner.address);

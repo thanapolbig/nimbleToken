@@ -367,7 +367,7 @@ func (ep *Endpoint)AutoClaimCheckin(c *gin.Context)  {
 	return
 }
 
-func (ep *Endpoint) AddVote(c *gin.Context)  {
+func (ep *Endpoint)AddVote(c *gin.Context)  {
 
 	var request InputKeyArray //model รับ input จาก body
 	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
@@ -477,14 +477,15 @@ func (ep *Endpoint)Vote(c *gin.Context)  {
 	vote,err := instance.Vote(session.TransactOpts,toAddress,amount)
 	if err != nil {
 		log.Errorf("[Vote.sendTransaction] : %+v",err)
+		c.JSON(http.StatusBadRequest, err)
 	}
 
 	c.JSON(http.StatusOK, vote)
 	return
 }
 
-func (ep *Endpoint) CheckScoreVote(c *gin.Context)  {
-	var request InputKeyValue
+func (ep *Endpoint)CheckScoreVote(c *gin.Context)  {
+	var request InputBalanceOf
 	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
@@ -494,31 +495,21 @@ func (ep *Endpoint) CheckScoreVote(c *gin.Context)  {
 		log.Errorf("[CheckScoreVote.connectWeb3] : %+v",err)
 	}
 	log.Infof("client : %s",client)
-	privateKey,err := ep.connectPrivateKey(request.PrivateKey)
-	if err != nil{
-		log.Errorf("[CheckScoreVote.connectPrivateKey] : %+v",err)
-	}
-	fromAddress,err := ep.convertWallet1(privateKey)
+
+	fromAddress := common.HexToAddress(request.Address)
 	if err != nil{
 		log.Errorf("[CheckScoreVote.convertWallet1] : %+v",err)
 	}
 	log.Infof("From : %s",fromAddress)
-	Auth := bind.NewKeyedTransactor(privateKey)
 
 	instance, err := _masterChef.NewApi(masterChefAddress, client)
 	if err != nil {
 		log.Errorf("[CheckScoreVote.NewApi] : %+v",err)
 	}
-
 	session := &TokenSession{
 		Contract: masterChefAddress,
 		CallOpts: &bind.CallOpts{
 			Pending: true,
-		},
-		TransactOpts: &bind.TransactOpts{
-			From:     Auth.From,
-			Signer:   Auth.Signer,
-			GasLimit: 3141592,
 		},
 	}
 	scoreVote,err := instance.GetScore(session.CallOpts,fromAddress)
@@ -676,7 +667,7 @@ func (ep *Endpoint)CreateEvent(c *gin.Context)  {
 	log.Infof("CreateEvent : %s", CreateEvent.Data())
 
 
-	c.JSON(http.StatusOK, "success")
+	c.JSON(http.StatusOK, CreateEvent)
 
 	return
 }
@@ -1126,3 +1117,60 @@ func (ep *Endpoint)EventInfo(c *gin.Context)  {
 
 	return
 }
+
+func (ep *Endpoint)SearchEvent(c *gin.Context)  {
+
+	var request InputKeyValue
+	if err := c.ShouldBindBodyWith(&request, binding.JSON); err != nil {
+		log.Errorf("[EventInfo] %+v",err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	client,err := ep.connectWeb3()
+	if err != nil {
+		log.Errorf("[SearchEvent.connectWeb3] : %+v",err)
+	}
+	fmt.Println(client)
+
+	privateKey,err := ep.connectPrivateKey(request.PrivateKey)
+	if err != nil{
+		log.Errorf("[SearchEvent.connectPrivateKey] : %+v",err)
+	}
+
+	fromAddress,err := ep.convertWallet1(privateKey)
+	if err != nil{
+		log.Errorf("[SearchEvent.convertWallet1] : %+v",err)
+	}
+	log.Infof("From : %s",fromAddress)
+
+	Auth := bind.NewKeyedTransactor(privateKey)
+
+	instance, err := _masterChef.NewApi(masterChefAddress, client)
+	if err != nil {
+		log.Errorf("[SearchEvent.NewApi] : %+v",err)
+	}
+
+	session := &TokenSession{
+		Contract: masterChefAddress,
+		CallOpts: &bind.CallOpts{
+			Pending: true,
+		},
+		TransactOpts: &bind.TransactOpts{
+			From:     Auth.From,
+			Signer:   Auth.Signer,
+			GasLimit: 3141592,
+		},
+	}
+
+	EventInfo, err := instance.SearchEvent(session.TransactOpts)
+	if err != nil {
+		log.Errorf("[SearchEvent.sendtransaction] : %+v",err)
+	}
+	log.Infof("SearchEvent : %s", EventInfo)
+
+	c.JSON(http.StatusOK, EventInfo)
+
+	return
+}
+

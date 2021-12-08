@@ -23,7 +23,7 @@ type InputMint struct {
 	Value		string	`json:"value"`
 }
 
-type InputAppove struct {
+type InputAppoveTransfer struct {
 	AddressSpender string `json:"addressSpender"`
 	PrivateKey     string `json:"privateKey"`
 	Value          int    `json:"value"`

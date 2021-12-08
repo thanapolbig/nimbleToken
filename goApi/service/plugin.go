@@ -14,6 +14,8 @@ import (
 )
 func (ep *Endpoint)connectWeb3()(client *ethclient.Client , err error)  {
 	client, err = ethclient.Dial("http://127.0.0.1:8545")
+	//client, err = ethclient.Dial("https://data-seed-prebsc-1-s1.binance.org:8545/")
+
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

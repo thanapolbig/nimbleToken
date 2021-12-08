@@ -27,8 +27,8 @@ contract MasterChef is Ownable {
 
     uint256 public workday;
     uint256 poolRewardYear = 50000000;   //50000
-    uint256 pointCheckin = 30;
-    uint256 pointVote = 30;
+    uint256 pointCheckin = 20;
+    uint256 pointVote = 20;
 
     function configMint(uint256 value)public onlyOwner returns(uint256) {
         poolRewardYear = value;
@@ -174,9 +174,8 @@ contract MasterChef is Ownable {
         eventInfo[eid].status = 1;
     }
 
-
-    function searchEvent()public returns(Event[] memory){
-        return eventInfo;
+    function searchEvent()public returns(uint256){
+        return eventInfo.length;
     }
 
     function searchEventByAddress(address from)public returns(uint[] memory){
@@ -211,13 +210,13 @@ contract MasterChef is Ownable {
     function closeEvent(uint eid)public{
         require(eventInfo[eid].createBy == msg.sender, "access denied");
         require(eventInfo[eid].status == 1, "status invalid");
-        eventInfo[eid].status = 0;
+        eventInfo[eid].status = 2;
     }
 
     function AcceptEvent(uint256 eid,address[] memory wallet)public{
         require(eventInfo[eid].createBy == msg.sender, "access denied");
         require(eventInfo[eid].status == 1, "status invalid");
-        eventInfo[eid].status = 2;
+        eventInfo[eid].status = 3;
         //transfer
 
         uint reward = eventInfo[eid].reward/wallet.length;
