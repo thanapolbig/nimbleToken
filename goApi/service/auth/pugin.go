@@ -32,9 +32,9 @@ func (repo *authRepo) InitAuthRepo(conf *app.Configs, em *app.ErrorMessage) *aut
 }
 
 func (repo *authRepo) getCharacter(request credentials) (detail character, err error) {
-	if err = app.Token.DB.Select("l.username ,l.password ,l.login_uuid ,c.id AS character_id ,c.login_id ,l.session ,r.role_name").
-		Table("character AS c ,login AS l ,role AS r ,role_permit AS rp").
-		Where("l.username = ? AND l.id = c.login_id AND l.role_id = r.id AND r.role_permit = rp.id ", request.Username).
+	if err = app.Token.DB.Select("l.username ,l.password ,l.login_uuid ,w.id AS wallet_id ,w.login_id ,l.session ,r.role_name").
+		Table("login AS l ,role AS r,wallet AS w ").
+		Where("l.username = ? AND l.id = w.login_id AND l.role_id = r.id", request.Username).
 		Find(&detail).Error; err != nil {
 		return
 	}
@@ -59,9 +59,9 @@ func (repo *authRepo) updateLastLogin(request credentials, timeNow time.Time, se
 
 func getSession(request int) (detail character, err error) {
 
-	if err = app.Token.DB.Select("l.username ,l.password ,l.login_uuid ,c.id AS character_id ,c.login_id ,l.session").
-		Table("character AS c ,login AS l").
-		Where("c.id = ? AND c.login_id = l.id ", request).
+	if err = app.Token.DB.Select("l.username ,l.password ,l.login_uuid ,w.id AS wallet_id ,w.login_id ,l.session").
+		Table("wallet AS w ,login AS l").
+		Where("w.id = ? AND w.login_id = l.id ", request).
 		Find(&detail).Error; err != nil {
 		return
 	}

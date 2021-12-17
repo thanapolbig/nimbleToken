@@ -8,8 +8,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/miguelmota/ethereum-development-with-go/app"
 	"io/ioutil"
-	"time"
 	"strconv"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -80,7 +80,7 @@ func (srv *authService) EnCode(request credentials) (result parseCode, err error
 	var detail character
 	detail, err = srv.repo.getCharacter(request)
 	loginId, _ := strconv.ParseInt(detail.LoginId, 10, 64)
-	
+
 	srv.loger.LogInfo("Check Character In Database ...", int(loginId))
 	if err != nil && err == gorm.ErrRecordNotFound {
 		err = srv.em.Auth.LoginNotFound
@@ -89,7 +89,7 @@ func (srv *authService) EnCode(request credentials) (result parseCode, err error
 	}
 	srv.loger.LogDebugf("Detail Target: [%+v]", detail.Username, int(loginId))
 	srv.loger.LogDebugf("Detail LoginUuid: [%+v]", detail.LoginUuid, int(loginId))
-	srv.loger.LogDebugf("Detail CharacterId: [%+v]", detail.CharacterId, int(loginId))
+	srv.loger.LogDebugf("Detail WalletId: [%+v]", detail.WalletId, int(loginId))
 	srv.loger.LogDebugf("Detail LoginIdOwnerFarm: [%+v]", detail.LoginId, int(loginId))
 	srv.loger.LogDebugf("Detail Session: [%+v]", detail.Session, int(loginId))
 	srv.loger.LogDebugf("Detail RoleName: [%+v]", detail.RoleName, int(loginId))
@@ -114,7 +114,7 @@ func (srv *authService) EnCode(request credentials) (result parseCode, err error
 	expirationTime := time.Now().Add(1 * time.Hour)
 	//expirationTime := time.Now().Add(time.Duration(viper.GetInt("expirationTime.expHour")) * time.Hour)
 	claims := &Claims {
-		CharacterId: detail.CharacterId,
+		WalletId: detail.WalletId,
 		Session:     session,
 		RoleName:    detail.RoleName,
 		StandardClaims: jwt.StandardClaims{
@@ -232,11 +232,6 @@ func (srv *authService)RefreshAccessToken(RefreshToken string) (result parseCode
 		log.Error(err)
 		return
 	}
-	if chclaims.CharacterId != 0 {
-		err = srv.em.Auth.InvalidRefreshToken
-		log.Error(err)
-		return
-	}
 	detail, err := srv.repo.checkSessionRf(chclaims.Session)
 	if err != nil {
 		err = srv.em.Auth.InvalidRefreshToken
@@ -248,7 +243,6 @@ func (srv *authService)RefreshAccessToken(RefreshToken string) (result parseCode
 	session := uuid.New().String()
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &Claims{
-		CharacterId: detail.CharacterId,
 		Session:     session,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -275,10 +269,10 @@ func (srv *authService)RefreshAccessToken(RefreshToken string) (result parseCode
 	return
 }
 
-func CheckSession(session string, characterId int) (checkSession bool, err error) {
+func CheckSession(session string,WalletId int) (checkSession bool, err error) {
 	//validate Session
 	var detail character
-	detail, err = getSession(characterId)
+	detail, err = getSession(WalletId)
 	if err != nil && err == gorm.ErrRecordNotFound {
 		checkSession = false
 		log.Error("Login not found.")
@@ -298,10 +292,6 @@ func (srv *authService) GetClaimCurrent(c *gin.Context) {
 	if claims, ok := c.Get("claim"); ok {
 		srv.claims = claims.(*Claims)
 	}
-}
-
-func (srv *authService) GetCharacterIdInClaim() int {
-	return srv.claims.CharacterId
 }
 
 func (srv *authService) GetRoleNameInClaim() string {

@@ -1173,4 +1173,3 @@ func (ep *Endpoint)SearchEvent(c *gin.Context)  {
 
 	return
 }
-

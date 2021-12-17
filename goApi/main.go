@@ -39,7 +39,7 @@ func main() {
 
 	//start http APP server
 	r := handler.Routes{} //new object
-	handleRoute := r.InitTransactionRoute()
+	handleRoute := r.InitTransactionRoute(&cv, &em)
 	AppSrv := &http.Server{
 		Addr:    fmt.Sprint(":", *portApp), //":8080"
 		Handler: handleRoute,

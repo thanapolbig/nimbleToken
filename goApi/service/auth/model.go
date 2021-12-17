@@ -31,14 +31,14 @@ type character struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	LoginUuid   string `json:"login_uuid"`
-	CharacterId int    `json:"character_id"`
+	WalletId	int    `json:"wallet_id"`
 	LoginId     string `json:"login_id"`
 	Session     string `json:"session"`
 	RoleName    string `json:"role_name"`
 }
 
 type Claims struct {
-	CharacterId int    `json:"character_id"`
+	WalletId	int    `json:"wallet_id"`
 	Session     string `json:"session"`
 	RoleName    string `json:"role_name"`
 	jwt.StandardClaims
